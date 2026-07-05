@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -12,12 +12,17 @@ import AdminLayout from './components/AdminLayout';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return <div className="page-container">Cargando...</div>;
   }
 
-  return user ? <AdminLayout>{children}</AdminLayout> : <Navigate to="/login" replace />;
+  return user ? (
+    <AdminLayout>{children}</AdminLayout>
+  ) : (
+    <Navigate to="/login" state={{ from: location }} replace />
+  );
 };
 
 function App() {

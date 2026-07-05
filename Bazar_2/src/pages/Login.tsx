@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -8,8 +8,16 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: Location })?.from?.pathname || '/';
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate(from, { replace: true });
+    }
+  }, [authLoading, user, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,13 +32,15 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (error: unknown) {
       const message = (error as Error).message || '';
       if (message.includes('user-not-found')) {
         setError('Usuario no encontrado.');
       } else if (message.includes('wrong-password')) {
         setError('Contraseña incorrecta.');
+      } else if (message.includes('invalid-credentials')) {
+        setError('Credenciales inválidas. Usa admin@verdelimon.cl / admin123.');
       } else {
         setError('Error al iniciar sesión. Verifica tus datos.');
       }

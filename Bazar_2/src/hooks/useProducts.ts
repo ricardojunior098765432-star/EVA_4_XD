@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { Product } from '../types';
 import {
   collection,
@@ -33,7 +33,7 @@ export const useProducts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -52,7 +52,7 @@ export const useProducts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const createProduct = async (product: Omit<Product, 'id'>) => {
     setLoading(true);

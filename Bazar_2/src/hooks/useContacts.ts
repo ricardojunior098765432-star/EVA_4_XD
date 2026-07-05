@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ContactRequest } from '../types';
 import {
   collection,
@@ -32,7 +32,7 @@ export const useContacts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadContacts = async () => {
+  const loadContacts = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -51,7 +51,7 @@ export const useContacts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const createContact = async (contact: Omit<ContactRequest, 'id'>) => {
     setLoading(true);

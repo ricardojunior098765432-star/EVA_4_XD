@@ -1,26 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import type { ContactRequest, Product } from '../types';
+import { useProducts } from '../hooks/useProducts';
+import { useContacts } from '../hooks/useContacts';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [contacts, setContacts] = useState<ContactRequest[]>([]);
+  const { products, loading: productsLoading, loadProducts } = useProducts();
+  const { contacts, loading: contactsLoading, loadContacts } = useContacts();
 
   useEffect(() => {
-    function safeParse<T>(key: string): T[] {
-      try {
-        const saved = localStorage.getItem(key);
-        return saved ? (JSON.parse(saved) as T[]) : [];
-      } catch {
-        return [];
-      }
-    }
-
-    setProducts(safeParse<Product>('products'));
-    setContacts(safeParse<ContactRequest>('contactRequests'));
-  }, []);
+    loadProducts();
+    loadContacts();
+  }, [loadContacts, loadProducts]);
 
   const summary = useMemo(() => {
     const lowStock = products.filter((product) => product.stock < 10).length;
@@ -53,13 +45,13 @@ const Dashboard = () => {
       <section className="stats-grid">
         <article className="stat-card stat-card--green">
           <h3>Productos</h3>
-          <p className="value">{summary.totalProducts}</p>
-          <small>{summary.lowStock} con stock bajo</small>
+          <p className="value">{productsLoading ? '...' : summary.totalProducts}</p>
+          <small>{productsLoading ? 'Cargando...' : `${summary.lowStock} con stock bajo`}</small>
         </article>
         <article className="stat-card stat-card--blue">
           <h3>Solicitudes</h3>
-          <p className="value">{summary.totalContacts}</p>
-          <small>{summary.pendingContacts} pendientes</small>
+          <p className="value">{contactsLoading ? '...' : summary.totalContacts}</p>
+          <small>{contactsLoading ? 'Cargando...' : `${summary.pendingContacts} pendientes`}</small>
         </article>
       </section>
 
