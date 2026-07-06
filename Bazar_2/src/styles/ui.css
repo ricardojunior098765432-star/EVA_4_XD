@@ -422,6 +422,35 @@
   font-size: 0.95rem;
 }
 
+.firebase-warning {
+  position: fixed;
+  inset: 0 0 auto 0;
+  width: 100%;
+  background: #fff4e5;
+  color: #78350f;
+  border-bottom: 1px solid #fcd34d;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  z-index: 50;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.firebase-warning strong {
+  color: #92400e;
+}
+
+body {
+  background: linear-gradient(135deg, #f7fdf7 0%, #eefbf0 100%);
+}
+
+.page-container {
+  padding-top: 84px;
+}
+
 @media (max-width: 900px) {
   .admin-shell {
     grid-template-columns: 1fr;

@@ -14,19 +14,6 @@ import { db, isFirebaseConfigured } from '../firebase';
 
 const contactsCollection = db ? collection(db, 'contactRequests') : null;
 
-const getLocalContacts = (): ContactRequest[] => {
-  try {
-    const saved = localStorage.getItem('contactRequests');
-    return saved ? (JSON.parse(saved) as ContactRequest[]) : [];
-  } catch {
-    return [];
-  }
-};
-
-const setLocalContacts = (contacts: ContactRequest[]) => {
-  localStorage.setItem('contactRequests', JSON.stringify(contacts));
-};
-
 export const useContacts = () => {
   const [contacts, setContacts] = useState<ContactRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +24,7 @@ export const useContacts = () => {
     setError(null);
 
     if (!isFirebaseConfigured || !contactsCollection) {
-      setContacts(getLocalContacts());
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }
@@ -57,13 +44,8 @@ export const useContacts = () => {
     setLoading(true);
     setError(null);
 
-    const newContact: ContactRequest = { ...contact, id: `${Date.now()}` };
-
     if (!isFirebaseConfigured || !contactsCollection) {
-      const current = getLocalContacts();
-      const next = [newContact, ...current];
-      setLocalContacts(next);
-      setContacts(next);
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }
@@ -84,10 +66,7 @@ export const useContacts = () => {
     setError(null);
 
     if (!isFirebaseConfigured || !db) {
-      const current = getLocalContacts();
-      const next = current.map((contact) => (contact.id === id ? { ...contact, ...updates } : contact));
-      setLocalContacts(next);
-      setContacts(next);
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }
@@ -109,10 +88,7 @@ export const useContacts = () => {
     setError(null);
 
     if (!isFirebaseConfigured || !db) {
-      const current = getLocalContacts();
-      const next = current.filter((contact) => contact.id !== id);
-      setLocalContacts(next);
-      setContacts(next);
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }

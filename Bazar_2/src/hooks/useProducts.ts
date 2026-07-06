@@ -15,19 +15,6 @@ import { db, isFirebaseConfigured } from '../firebase';
 
 const productsCollection = db ? collection(db, 'products') : null;
 
-const getLocalProducts = (): Product[] => {
-  try {
-    const saved = localStorage.getItem('products');
-    return saved ? (JSON.parse(saved) as Product[]) : [];
-  } catch {
-    return [];
-  }
-};
-
-const setLocalProducts = (products: Product[]) => {
-  localStorage.setItem('products', JSON.stringify(products));
-};
-
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +25,7 @@ export const useProducts = () => {
     setError(null);
 
     if (!isFirebaseConfigured || !productsCollection) {
-      setProducts(getLocalProducts());
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }
@@ -57,13 +44,9 @@ export const useProducts = () => {
   const createProduct = async (product: Omit<Product, 'id'>) => {
     setLoading(true);
     setError(null);
-    const newProduct = { ...product, id: `${Date.now()}`, createdAt: product.createdAt ?? new Date().toISOString() };
 
     if (!isFirebaseConfigured || !productsCollection) {
-      const current = getLocalProducts();
-      const next = [newProduct, ...current];
-      setLocalProducts(next);
-      setProducts(next);
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }
@@ -87,10 +70,7 @@ export const useProducts = () => {
     setError(null);
 
     if (!isFirebaseConfigured || !db) {
-      const current = getLocalProducts();
-      const next = current.map((item) => (item.id === product.id ? product : item));
-      setLocalProducts(next);
-      setProducts(next);
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }
@@ -119,10 +99,7 @@ export const useProducts = () => {
     setError(null);
 
     if (!isFirebaseConfigured || !db) {
-      const current = getLocalProducts();
-      const next = current.filter((product) => product.id !== id);
-      setLocalProducts(next);
-      setProducts(next);
+      setError('Firebase no está configurado.');
       setLoading(false);
       return;
     }
@@ -143,10 +120,9 @@ export const useProducts = () => {
     setError(null);
 
     if (!isFirebaseConfigured || !db) {
-      const current = getLocalProducts();
-      const found = current.find((item) => item.id === id) ?? null;
+      setError('Firebase no está configurado.');
       setLoading(false);
-      return found;
+      return null;
     }
 
     try {

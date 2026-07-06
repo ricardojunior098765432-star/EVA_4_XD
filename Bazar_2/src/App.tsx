@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { isFirebaseConfigured } from './firebase';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProductList from './pages/Products/ProductList';
@@ -26,9 +27,16 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 };
 
 function App() {
+  const firebaseWarning = !isFirebaseConfigured ? (
+    <div className="firebase-warning">
+      <strong>Atención:</strong> Firebase no está configurado. Copia `.env.example` a `.env` y completa las variables de Firebase.
+    </div>
+  ) : null;
+
   return (
     <AuthProvider>
       <Router>
+        {firebaseWarning}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/contacto" element={<ContactForm />} />
